@@ -94,6 +94,8 @@ enum quantum_keycodes {
     QK_UNICODEMAP_MAX      = 0xBFFF,
     QK_UNICODEMAP_PAIR     = 0xC000,
     QK_UNICODEMAP_PAIR_MAX = 0xFFFF,
+    QK_UNICODEMAP_Q = 0x00000000,
+    QK_UNICODEMAP_Q_MAX = 0x3FFF,
 #endif
 
     // Loose keycodes - to be used directly
@@ -859,6 +861,7 @@ enum quantum_keycodes {
 // Allows Unicode input up to 0x10FFFF, requires unicode_map
 #    define X(i) (QK_UNICODEMAP | (i))
 #    define XP(i, j) (QK_UNICODEMAP_PAIR | ((i)&0x7F) | (((j)&0x7F) << 7))  // 127 max i and j
+#    define XQ(i, j, l, m) (QK_UNICODEMAP_Q | i | j<<16 | l<<32 | m<<48) // 14000 ~ character available
 #endif
 
 #define UC_MOD UNICODE_MODE_FORWARD
