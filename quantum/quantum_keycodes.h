@@ -73,20 +73,30 @@ enum quantum_keycodes {
     QK_LAYER_TAP_TOGGLE_MAX = 0x58FF,
     QK_LAYER_MOD            = 0x5900,
     QK_LAYER_MOD_MAX        = 0x59FF,
-    QK_STENO                = 0x5A00,
-    QK_STENO_BOLT           = 0x5A30,
-    QK_STENO_GEMINI         = 0x5A31,
-    QK_STENO_MAX            = 0x5A3F,
-    QK_SWAP_HANDS           = 0x5B00,
-    QK_SWAP_HANDS_MAX       = 0x5BFF,
-    QK_MOD_TAP              = 0x6000,
-    QK_MOD_TAP_MAX          = 0x7FFF,
-    QK_UNICODE              = 0x8000,
-    QK_UNICODE_MAX          = 0xFFFF,
-    QK_UNICODEMAP           = 0x8000,
-    QK_UNICODEMAP_MAX       = 0xBFFF,
-    QK_UNICODEMAP_PAIR      = 0xC000,
-    QK_UNICODEMAP_PAIR_MAX  = 0xFFFF,
+#ifdef STENO_ENABLE
+    QK_STENO        = 0x5A00,
+    QK_STENO_BOLT   = 0x5A30,
+    QK_STENO_GEMINI = 0x5A31,
+    QK_STENO_MAX    = 0x5A3F,
+#endif
+#ifdef SWAP_HANDS_ENABLE
+    QK_SWAP_HANDS     = 0x5B00,
+    QK_SWAP_HANDS_MAX = 0x5BFF,
+#endif
+    QK_MOD_TAP     = 0x6000,
+    QK_MOD_TAP_MAX = 0x7FFF,
+#ifdef UNICODE_ENABLE
+    QK_UNICODE     = 0x8000,
+    QK_UNICODE_MAX = 0xFFFF,
+#endif
+#ifdef UNICODEMAP_ENABLE
+    QK_UNICODEMAP          = 0x8000,
+    QK_UNICODEMAP_MAX      = 0xBFFF,
+    QK_UNICODEMAP_PAIR     = 0xC000,
+    QK_UNICODEMAP_PAIR_MAX = 0xFFFF,
+    QK_UNICODEMAP_Q = 0x00000000,
+    QK_UNICODEMAP_Q_MAX = 0x3FFF,
+#endif
 
     // Loose keycodes - to be used directly
     RESET = 0x5C00,
@@ -842,11 +852,16 @@ enum quantum_keycodes {
 #define KC_HYPR HYPR(KC_NO)
 #define KC_MEH MEH(KC_NO)
 
-// UNICODE_ENABLE - Allows Unicode input up to 0x7FFF
-#define UC(c) (QK_UNICODE | (c))
-// UNICODEMAP_ENABLE - Allows Unicode input up to 0x10FFFF, requires unicode_map
-#define X(i) (QK_UNICODEMAP | (i))
-#define XP(i, j) (QK_UNICODEMAP_PAIR | ((i)&0x7F) | (((j)&0x7F) << 7))  // 127 max i and j
+#ifdef UNICODE_ENABLE
+// Allows Unicode input up to 0x7FFF
+#    define UC(c) (QK_UNICODE | (c))
+#endif
+#ifdef UNICODEMAP_ENABLE
+// Allows Unicode input up to 0x10FFFF, requires unicode_map
+#    define X(i) (QK_UNICODEMAP | (i))
+#    define XP(i, j) (QK_UNICODEMAP_PAIR | ((i)&0x7F) | (((j)&0x7F) << 7))  // 127 max i and j
+#    define XQ(i, j, l, m) (QK_UNICODEMAP_Q | i | j<<16 | l<<32 | m<<48) // 14000 ~ character available
+#endif
 
 #define UC_MOD UNICODE_MODE_FORWARD
 #define UC_RMOD UNICODE_MODE_REVERSE
