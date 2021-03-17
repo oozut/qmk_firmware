@@ -18,7 +18,10 @@
 
 #include "process_unicode_common.h"
 
+extern const uint32_t PROGMEM unicode_map_shift[];
+extern const uint32_t PROGMEM unicode_map_altgr[];
+extern const uint32_t PROGMEM unicode_map_altgrshift[];
 extern const uint32_t PROGMEM unicode_map[];
 
-uint16_t unicodemap_index(uint16_t keycode);
+uint16_t unicodemap_index(uint64_t keycode);
 bool     process_unicodemap(uint16_t keycode, keyrecord_t *record);
