@@ -26,6 +26,14 @@ RGB_MATRIX_DRIVER = IS31FL3731
 #SERIAL_LINK_ENABLE = yes
 EEPROM_DRIVER = i2c
 
-#project specific files
+## Enable Unicode for full support of bepo standard
+UNICODEMAP_ENABLE = yes
+
+## Enable the leader method
+LEADER_ENABLE = yes
+
+## Enabling the tap dance for the double red arrow for enter
+TAP_DANCE_ENABLE = yes
+
 SRC += matrix.c
 QUANTUM_LIB_SRC += i2c_master.c
