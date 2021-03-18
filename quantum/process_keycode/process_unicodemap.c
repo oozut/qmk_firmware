@@ -16,32 +16,62 @@
 
 #include "process_unicodemap.h"
 
-__attribute__((weak)) uint16_t unicodemap_index(uint16_t keycode) {
-    if (keycode >= QK_UNICODEMAP_PAIR) {
-        // Keycode is a pair: extract index based on Shift / Caps Lock state
-        uint16_t index = keycode - QK_UNICODEMAP_PAIR;
+#define LAST(k,n) ((k) & ((1<<(n))-1))
+#define MID(k,m,n) LAST((k)>>(m),((n)-(m)))
 
-        uint8_t mods = get_mods() | get_weak_mods();
-#ifndef NO_ACTION_ONESHOT
-        mods |= get_oneshot_mods();
-#endif
+// __attribute__((weak)) uint16_t unicodemap_index(uint64_t keycode) {
+//     if (keycode >= QK_UNICODEMAP_PAIR) {
+//         // Keycode is a pair: extract index based on Shift / Caps Lock state
+//         uint16_t index = keycode - QK_UNICODEMAP_PAIR;
 
-        bool shift = mods & MOD_MASK_SHIFT;
-        bool caps  = host_keyboard_led_state().caps_lock;
-        if (shift ^ caps) {
-            index >>= 7;
-        }
+//         bool shift = unicode_saved_mods & MOD_MASK_SHIFT;
+//         bool caps  = IS_HOST_LED_ON(USB_LED_CAPS_LOCK);
+//         if (shift ^ caps) {
+//             index >>= 7;
+//         }
 
-        return index & 0x7F;
-    } else {
-        // Keycode is a regular index
-        return keycode - QK_UNICODEMAP;
+//         return index & 0x7F;
+//     } else {
+//         // Keycode is a regular index
+//         return keycode - QK_UNICODEMAP;
+//     }
+// }
+
+__attribute__((weak)) uint16_t unicodemap_index(uint64_t keycode) {
+    
+    bool shift = unicode_saved_mods & MOD_MASK_SHIFT;
+    bool caps  = IS_HOST_LED_ON(USB_LED_CAPS_LOCK);
+    bool shift_all = shift ^ caps;
+    bool altgr = MOD_MASK_AG;
+
+    if(shift_all){
+         if(altgr){
+            // return altgr + shift, the most significant number
+            return pgm_read_dword(unicode_map_altgrshift + MID(keycode,48,64));
+        } 
+        else{
+            // return shift, the third most significant
+            return pgm_read_dword(unicode_map_shift + MID(keycode,16,32));
+        }    
     }
+    else{
+        if(altgr){
+            // return altgr, the second most significant
+            return pgm_read_dword(unicode_map_altgr + MID(keycode,32,48));
+        }
+        else{
+            // return normal, the least significant
+            return pgm_read_dword(unicode_map + MID(keycode,0,16));
+        }
+    }
+
 }
 
+
+
 bool process_unicodemap(uint16_t keycode, keyrecord_t *record) {
-    if (keycode >= QK_UNICODEMAP && keycode <= QK_UNICODEMAP_PAIR_MAX && record->event.pressed) {
-        uint32_t code_point = pgm_read_dword(unicode_map + unicodemap_index(keycode));
+    if (keycode >= QK_UNICODEMAP && keycode <= QK_UNICODEMAP_Q_MAX && record->event.pressed) {
+        uint32_t code_point = unicodemap_index(keycode);// pgm_read_dword(unicode_map + unicodemap_index(keycode));
         register_unicode(code_point);
     }
     return true;
