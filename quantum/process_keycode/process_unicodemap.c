@@ -39,7 +39,7 @@
 
 __attribute__((weak)) uint16_t unicodemap_index(uint64_t keycode) {
     
-    bool shift = unicode_saved_mods & MOD_MASK_SHIFT;
+    bool shift = MOD_MASK_SHIFT;
     bool caps  = IS_HOST_LED_ON(USB_LED_CAPS_LOCK);
     bool shift_all = shift ^ caps;
     bool altgr = MOD_MASK_AG;
